@@ -8,17 +8,6 @@ async function loadAudio(url) {
   return audioContext.decodeAudioData(arrayBuffer);
 }
 
-function setStereoPan(pannerNode, pan) {
-  var xDeg = pan * 45;
-  var zDeg = xDeg + 90;
-  if (zDeg > 90) {
-    zDeg = 180 - zDeg;
-  }
-  var x = Math.sin(xDeg * (Math.PI / 180));
-  var z = Math.sin(zDeg * (Math.PI / 180));
-  pannerNode.setPosition(x, 0, z);
-}
-
 function startAudioLoop(audioBuffer, pan = 0, rate = 1) {
   const sourceNode = audioContext.createBufferSource();
 
@@ -26,8 +15,8 @@ function startAudioLoop(audioBuffer, pan = 0, rate = 1) {
   sourceNode.loop = true;
   sourceNode.playbackRate.value = rate;
 
-  const pannerNode = audioContext.createPanner();
-  setStereoPan(pannerNode, pan);
+  const pannerNode = audioContext.createStereoPanner();
+  pannerNode.pan.value = pan;
 
   sourceNode.connect(pannerNode);
   pannerNode.connect(audioContext.destination);

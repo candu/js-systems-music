@@ -80,20 +80,22 @@ async function getSample(instrument, noteAndOctave) {
   return { audioBuffer, distance };
 }
 
-async function playSample(instrument, note) {
+async function playSample(instrument, note, delay) {
   const { audioBuffer, distance } = await getSample(instrument, note);
   let playbackRate = Math.pow(2, distance / 12);
   let bufferSource = audioContext.createBufferSource();
   bufferSource.buffer = audioBuffer;
   bufferSource.playbackRate.value = playbackRate;
   bufferSource.connect(audioContext.destination);
-  bufferSource.start();
+  bufferSource.start(audioContext.currentTime + delay);
 }
 
-setTimeout(() => playSample('Vibraphone', 'F4'),  1000);
-setTimeout(() => playSample('Vibraphone', 'Ab4'), 2000);
-setTimeout(() => playSample('Vibraphone', 'C5'),  3000);
-setTimeout(() => playSample('Vibraphone', 'Db5'), 4000);
-setTimeout(() => playSample('Vibraphone', 'Eb5'), 5000);
-setTimeout(() => playSample('Vibraphone', 'F5'),  6000);
-setTimeout(() => playSample('Vibraphone', 'Ab5'), 7000);
+function startLoop(instrument, note, loopLength, delay) {
+  playSample(instrument, note, delay);
+  return setInterval(
+    () => playSample(instrument, note, delay),
+    loopLength * 1000,
+  );
+}
+
+startLoop('Vibraphone', 'C4', 20, 5);
